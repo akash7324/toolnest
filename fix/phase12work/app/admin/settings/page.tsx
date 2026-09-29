@@ -1,0 +1,3 @@
+import { redirect } from "next/navigation"; import { auth } from "@/auth"; import { AdminShell } from "@/components/admin/admin-shell"; import { SettingsPanel } from "@/components/admin/settings-panel";
+export const dynamic="force-dynamic"; export const metadata={title:"Site Settings"};
+export default async function SettingsPage(){const s=await auth();if(!s?.user?.id)redirect("/login");if(s.user.role!=="admin")redirect("/dashboard");return <AdminShell title="Site Settings" description="Manage global branding, maintenance mode and future advertising configuration." current="/admin/settings"><SettingsPanel/></AdminShell>}

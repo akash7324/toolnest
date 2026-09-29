@@ -1,0 +1,3 @@
+import { redirect } from "next/navigation"; import { auth } from "@/auth"; import { AdminShell } from "@/components/admin/admin-shell"; import { CatalogManager } from "@/components/admin/catalog-manager";
+export const dynamic="force-dynamic"; export const metadata={title:"Tool Manager"};
+export default async function ToolsPage(){const s=await auth();if(!s?.user?.id)redirect("/login");if(s.user.role!=="admin")redirect("/dashboard");return <AdminShell title="Tool Manager" description="Manage the searchable tool catalog and control which tools are enabled." current="/admin/tools"><CatalogManager mode="tools"/></AdminShell>}

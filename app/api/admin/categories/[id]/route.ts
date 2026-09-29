@@ -1,0 +1,7 @@
+import { NextResponse } from "next/server";
+import { requireAdminResponse } from "@/lib/admin/route";
+import { connectToDatabase } from "@/lib/mongodb";
+import Category from "@/models/category";
+import { categorySchema } from "@/lib/admin/validation";
+export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) { const { response } = await requireAdminResponse(); if (response) return response; const { id } = await params; const parsed = categorySchema.safeParse(await request.json().catch(() => null)); if (!parsed.success) return NextResponse.json({ error: "Invalid category data." }, { status: 400 }); try { await connectToDatabase(); const row = await Category.findByIdAndUpdate(id, parsed.data, { new: true, runValidators: true }).lean(); if (!row) return NextResponse.json({ error: "Category not found." }, { status: 404 }); return NextResponse.json({ ...row, _id: row._id.toString() }); } catch { return NextResponse.json({ error: "Unable to update category. The slug may already exist." }, { status: 409 }); } }
+export async function DELETE(_: Request, { params }: { params: Promise<{ id: string }> }) { const { response } = await requireAdminResponse(); if (response) return response; const { id } = await params; await connectToDatabase(); const row = await Category.findByIdAndDelete(id); if (!row) return NextResponse.json({ error: "Category not found." }, { status: 404 }); return NextResponse.json({ ok: true }); }

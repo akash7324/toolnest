@@ -1,0 +1,7 @@
+import { NextResponse } from "next/server";
+import { connectToDatabase } from "@/lib/mongodb";
+import Tool from "@/models/tool";
+import { requireAdminResponse } from "@/lib/admin/route";
+import { toolSchema } from "@/lib/admin/validation";
+export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) { const { response } = await requireAdminResponse(); if (response) return response; const { id } = await params; const parsed = toolSchema.safeParse(await request.json().catch(() => null)); if (!parsed.success) return NextResponse.json({ error: "Invalid tool data." }, { status: 400 }); try { await connectToDatabase(); const updated = await Tool.findByIdAndUpdate(id, parsed.data, { new: true, runValidators: true }).lean(); if (!updated) return NextResponse.json({ error: "Tool not found." }, { status: 404 }); return NextResponse.json({ ...updated, _id: updated._id.toString() }); } catch { return NextResponse.json({ error: "Unable to update tool. The slug may already exist." }, { status: 409 }); } }
+export async function DELETE(_: Request, { params }: { params: Promise<{ id: string }> }) { const { response } = await requireAdminResponse(); if (response) return response; const { id } = await params; await connectToDatabase(); const deleted = await Tool.findByIdAndDelete(id); if (!deleted) return NextResponse.json({ error: "Tool not found." }, { status: 404 }); return NextResponse.json({ ok: true }); }

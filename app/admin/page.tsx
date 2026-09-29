@@ -1,0 +1,3 @@
+import { redirect } from "next/navigation"; import { auth } from "@/auth"; import { AdminShell } from "@/components/admin/admin-shell"; import { ReportsPanel } from "@/components/admin/reports-panel";
+export const dynamic="force-dynamic"; export const metadata={title:"Admin Dashboard"};
+export default async function AdminPage(){const s=await auth();if(!s?.user?.id)redirect("/login");if(s.user.role!=="admin")redirect("/dashboard");return <AdminShell title="Admin Dashboard" description="Manage ToolNest users, catalog, content, messages and platform settings." current="/admin"><ReportsPanel/></AdminShell>}

@@ -1,0 +1,3 @@
+import { redirect } from "next/navigation"; import { auth } from "@/auth"; import { AdminShell } from "@/components/admin/admin-shell"; import { SubscriptionsPanel } from "@/components/admin/subscriptions-panel";
+export const dynamic="force-dynamic"; export const metadata={title:"Subscriptions"};
+export default async function SubscriptionsPage(){const s=await auth();if(!s?.user?.id)redirect("/login");if(s.user.role!=="admin")redirect("/dashboard");return <AdminShell title="Subscriptions" description="Review subscription records. Razorpay/payment processing remains a future module." current="/admin/subscriptions"><SubscriptionsPanel/></AdminShell>}

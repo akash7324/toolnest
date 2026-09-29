@@ -1,0 +1,3 @@
+import { redirect } from "next/navigation"; import { auth } from "@/auth"; import { AdminShell } from "@/components/admin/admin-shell"; import { CatalogManager } from "@/components/admin/catalog-manager";
+export const dynamic="force-dynamic"; export const metadata={title:"Category Manager"};
+export default async function CategoriesPage(){const s=await auth();if(!s?.user?.id)redirect("/login");if(s.user.role!=="admin")redirect("/dashboard");return <AdminShell title="Category Manager" description="Create and maintain categories used across the ToolNest catalog." current="/admin/categories"><CatalogManager mode="categories"/></AdminShell>}

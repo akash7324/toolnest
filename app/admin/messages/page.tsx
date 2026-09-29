@@ -1,0 +1,3 @@
+import { redirect } from "next/navigation"; import { auth } from "@/auth"; import { AdminShell } from "@/components/admin/admin-shell"; import { MessagesPanel } from "@/components/admin/messages-panel";
+export const dynamic="force-dynamic"; export const metadata={title:"Contact Messages"};
+export default async function MessagesPage(){const s=await auth();if(!s?.user?.id)redirect("/login");if(s.user.role!=="admin")redirect("/dashboard");return <AdminShell title="Contact Messages" description="Review incoming contact requests and archive resolved conversations." current="/admin/messages"><MessagesPanel/></AdminShell>}

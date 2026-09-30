@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Menu, Search, X } from "lucide-react";
 import { useState } from "react";
+import { useSession, signOut } from "next-auth/react";
 import { ThemeToggle } from "./theme-toggle";
 
 const links = [
@@ -15,6 +16,9 @@ const links = [
 
 export function Navbar() {
   const [open, setOpen] = useState(false);
+  const { data: session } = useSession();
+
+  const loggedIn = !!session?.user;
 
   return (
     <header className="sticky top-0 z-50 border-b border-[var(--border)] bg-[color-mix(in_srgb,var(--background)_88%,transparent)] backdrop-blur-xl">
@@ -46,9 +50,42 @@ export function Navbar() {
           >
             <Search size={18} />
           </Link>
-          <Link href="/login" className="hidden rounded-xl px-3 py-2 text-sm font-semibold text-[var(--muted)] hover:text-[var(--foreground)] sm:inline-flex">Log in</Link>
-          <Link href="/register" className="hidden rounded-xl bg-indigo-600 px-3 py-2 text-sm font-bold text-white hover:bg-indigo-700 sm:inline-flex">Sign up</Link>
+
+          {loggedIn ? (
+            <>
+              <Link
+                href="/dashboard"
+                className="hidden rounded-xl px-3 py-2 text-sm font-semibold text-[var(--muted)] hover:text-[var(--foreground)] sm:inline-flex"
+              >
+                Dashboard
+              </Link>
+              <button
+                type="button"
+                onClick={() => signOut({ callbackUrl: "/" })}
+                className="hidden rounded-xl bg-indigo-600 px-3 py-2 text-sm font-bold text-white hover:bg-indigo-700 sm:inline-flex"
+              >
+                Sign out
+              </button>
+            </>
+          ) : (
+            <>
+              <Link
+                href="/login"
+                className="hidden rounded-xl px-3 py-2 text-sm font-semibold text-[var(--muted)] hover:text-[var(--foreground)] sm:inline-flex"
+              >
+                Log in
+              </Link>
+              <Link
+                href="/register"
+                className="hidden rounded-xl bg-indigo-600 px-3 py-2 text-sm font-bold text-white hover:bg-indigo-700 sm:inline-flex"
+              >
+                Sign up
+              </Link>
+            </>
+          )}
+
           <ThemeToggle />
+
           <button
             type="button"
             aria-label={open ? "Close menu" : "Open menu"}
@@ -62,20 +99,62 @@ export function Navbar() {
       </div>
 
       {open && (
-        <nav className="border-t border-[var(--border)] bg-[var(--background)] px-4 py-4 md:hidden" aria-label="Mobile navigation">
+        <nav
+          className="border-t border-[var(--border)] bg-[var(--background)] px-4 py-4 md:hidden"
+          aria-label="Mobile navigation"
+        >
           <div className="mx-auto flex max-w-7xl flex-col gap-1">
-            <Link href="/login" onClick={() => setOpen(false)} className="rounded-xl px-3 py-3 text-sm font-semibold text-indigo-600">Log in</Link>
-            <Link href="/register" onClick={() => setOpen(false)} className="rounded-xl bg-indigo-600 px-3 py-3 text-sm font-bold text-white">Create account</Link>
-            {links.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={() => setOpen(false)}
-                className="rounded-xl px-3 py-3 text-sm font-semibold transition hover:bg-black/5 dark:hover:bg-white/5"
-              >
-                {link.label}
-              </Link>
-            ))}
+            {loggedIn ? (
+              <>
+                <Link
+                  href="/dashboard"
+                  onClick={() => setOpen(false)}
+                  className="rounded-xl px-3 py-3 text-sm font-semibold text-indigo-600"
+                >
+                  Dashboard
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setOpen(false);
+                    signOut({ callbackUrl: "/" });
+                  }}
+                  className="rounded-xl bg-indigo-600 px-3 py-3 text-left text-sm font-bold text-white"
+                >
+                  Sign out
+                </button>
+              </>
+            ) : (
+              <>
+                <Link
+                  href="/login"
+                  onClick={() => setOpen(false)}
+                  className="rounded-xl px-3 py-3 text-sm font-semibold text-indigo-600"
+                >
+                  Log in
+                </Link>
+                <Link
+                  href="/register"
+                  onClick={() => setOpen(false)}
+                  className="rounded-xl bg-indigo-600 px-3 py-3 text-sm font-bold text-white"
+                >
+                  Create account
+                </Link>
+              </>
+            )}
+
+            {links
+              .filter((link) => link.label !== "Dashboard")
+              .map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => setOpen(false)}
+                  className="rounded-xl px-3 py-3 text-sm font-semibold transition hover:bg-black/5 dark:hover:bg-white/5"
+                >
+                  {link.label}
+                </Link>
+              ))}
           </div>
         </nav>
       )}

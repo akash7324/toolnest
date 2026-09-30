@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { Copy, RotateCcw } from "lucide-react";
 import type { TextToolDefinition } from "@/lib/text-tools/data";
+import { CompletedTracker } from "@/components/dashboard/usage-tracker";
 
 const titleCase = (value: string) => value.toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase());
 const sentenceCase = (value: string) => value.toLowerCase().replace(/(^|[.!?]\s+)\w/g, (char) => char.toUpperCase());
@@ -63,10 +64,11 @@ export function TextToolShell({ tool }: { tool: TextToolDefinition }) {
     setText("");
     setCopied(false);
   }
-
+const completed = text.trim().length > 0;
   return (
     <div className="rounded-3xl border border-[var(--border)] bg-[var(--card)] p-5 shadow-sm sm:p-8">
-      {(tool.slug === "case-converter" || tool.slug === "text-sorter" || tool.slug === "text-reverser") && (
+    <CompletedTracker toolSlug={tool.slug} enabled={completed} />     
+ {(tool.slug === "case-converter" || tool.slug === "text-sorter" || tool.slug === "text-reverser") && (
         <div className="mb-5 flex flex-wrap gap-2">
           {tool.slug === "case-converter" && ["upper", "lower", "title", "sentence"].map((mode) => <button key={mode} type="button" onClick={() => setCaseMode(mode)} className={`rounded-xl px-4 py-2 text-sm font-semibold ${caseMode === mode ? "bg-indigo-600 text-white" : "border border-[var(--border)]"}`}>{mode}</button>)}
           {tool.slug === "text-sorter" && ["az", "za"].map((mode) => <button key={mode} type="button" onClick={() => setSortMode(mode)} className={`rounded-xl px-4 py-2 text-sm font-semibold ${sortMode === mode ? "bg-indigo-600 text-white" : "border border-[var(--border)]"}`}>{mode === "az" ? "A → Z" : "Z → A"}</button>)}

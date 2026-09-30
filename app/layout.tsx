@@ -4,6 +4,7 @@ import { siteConfig } from "@/config/site";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { AdSenseScript } from "@/components/ads/adsense-script";
+import { Providers } from "@/components/providers";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
@@ -19,16 +20,26 @@ export const metadata: Metadata = {
     siteName: "ToolNest",
     type: "website",
   },
-  twitter: { card: "summary_large_image", title: "ToolNest", description: siteConfig.description },
+  twitter: {
+    card: "summary_large_image",
+    title: "ToolNest",
+    description: siteConfig.description,
+  },
 };
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default function RootLayout({
+  children,
+}: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body>
         <AdSenseScript />
-        <Navbar />
-        {children}
+
+        <Providers>
+          <Navbar />
+          {children}
+        </Providers>
+
         <Footer />
       </body>
     </html>
